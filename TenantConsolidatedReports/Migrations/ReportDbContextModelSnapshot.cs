@@ -24,11 +24,12 @@ namespace TenantConsolidatedReports.Migrations
 
             modelBuilder.Entity("TenantConsolidatedReports.Models.Entities.BusinessUnitReport", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<Guid>("BusinessUnitId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -40,18 +41,18 @@ namespace TenantConsolidatedReports.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("LastUpdated")
+                    b.Property<DateTime?>("LastUpdated")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ParentId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ParentId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ParentName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("TenantName")
                         .IsRequired()
@@ -61,11 +62,11 @@ namespace TenantConsolidatedReports.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UnitHeadId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UnitHeadId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("UnitId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UnitId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 

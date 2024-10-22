@@ -1,6 +1,6 @@
-﻿namespace TenantConsolidatedReports.Models.Entities
+﻿namespace TenantConsolidatedReports.Models.DTOs
 {
-    public class BusinessUnitReport
+    public class BusinessUnitReportDTO
     {
         public Guid Id { get; set; }
         public Guid BusinessUnitId { get; set; }
@@ -12,8 +12,9 @@
         public Guid UnitHeadId { get; set; }
         public string UnitHeadFullName { get; set; }
         public Guid UnitId { get; set; }
-        public Boolean IsDeleted { get; set; } = false;
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public Boolean IsDeleted { get; set; }
+        public DateTime CreatedDate { get; set; }
         public DateTime? LastUpdated { get; set; }
+
     }
 }
