@@ -11,7 +11,7 @@
         public string ParentName { get; set; }
         public Guid UnitHeadId { get; set; }
         public string UnitHeadFullName { get; set; }
-        public Guid UnitId { get; set; }
+        public string UnitId { get; set; }
         public Boolean IsDeleted { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? LastUpdated { get; set; }

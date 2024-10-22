@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TenantConsolidatedReports.Models.Entities
 {
-    public class OrganizationUnit
+    public class AbpOrganizationUnit
     {
         [Key]
         public Guid Id { get; set; }
@@ -45,7 +45,7 @@ namespace TenantConsolidatedReports.Models.Entities
 
         public DateTime? DeletionTime { get; set; }
 
-        public string Address { get; set; }
+        public string? Address { get; set; }
 
         [Required]
         public int BusinessUnitWeight { get; set; } = 0; // Default value
@@ -65,12 +65,12 @@ namespace TenantConsolidatedReports.Models.Entities
         [Required]
         public Guid Role { get; set; } = Guid.Empty; // Default value
 
-        public string SolId { get; set; }
+        public string? SolId { get; set; }
 
         [Required]
         public int Status { get; set; } = 0; // Default value
 
-        public string Tag { get; set; }
+        public string? Tag { get; set; }
 
         public Guid? UnitHeadId { get; set; }
 
