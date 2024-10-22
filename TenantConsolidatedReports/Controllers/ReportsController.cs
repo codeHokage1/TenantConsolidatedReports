@@ -112,7 +112,7 @@ namespace TenantConsolidatedReports.Controllers
                     };
                     await _reportDbContext.Reports.AddAsync(newBusinessUnitReport);
                     await _reportDbContext.SaveChangesAsync();
-                    newlyAddedReport++;
+                    newlyAddedReport++;                    
                 } else
                 {
                     // if yes, find that businessUnit details in the report and update the info from the identityDb
@@ -130,6 +130,29 @@ namespace TenantConsolidatedReports.Controllers
                     updatedReport++;
                 }
             }
+
+            // Check for Business Report in the ReportsUpdateExecution table
+            var reportUpdateExecution = await _reportDbContext.ReportsUpdateExecutions.FirstOrDefaultAsync(x => x.ReportType == "BusinessUnitReport");
+            if (reportUpdateExecution == null)
+            {
+                var newReportUpdateExecution = new ReportsUpdateExecution
+                {
+                    ReportType = "BusinessUnitReport",
+                    LastExecuted = DateTime.Now,
+                    ReportsUpdated = updatedReport,
+                    ReportsNewlyAdded = newlyAddedReport
+                };
+                await _reportDbContext.ReportsUpdateExecutions.AddAsync(newReportUpdateExecution);
+                await _reportDbContext.SaveChangesAsync();
+            } else
+            {
+                reportUpdateExecution.LastExecuted = DateTime.Now;
+                reportUpdateExecution.ReportsUpdated = updatedReport;
+                reportUpdateExecution.ReportsNewlyAdded = newlyAddedReport;
+                reportUpdateExecution.RecordUpdatedAt = DateTime.Now;
+                await _reportDbContext.SaveChangesAsync();
+            }
+
 
             // return a simple object that shows the number of business units updated and added
             return Ok(new { updatedReport, newlyAddedReport });
