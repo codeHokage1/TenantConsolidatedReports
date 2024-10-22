@@ -10,10 +10,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add DbContext
+// Add DbContext for report
 builder.Services.AddDbContext<ReportDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("ConsolidatedReport"));
+});
+
+// Add DbContext for identity dbs
+builder.Services.AddDbContext<IdentityDBContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Organization"));
 });
 
 var app = builder.Build();
