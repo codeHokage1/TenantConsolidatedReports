@@ -22,8 +22,11 @@ namespace TenantConsolidatedReports
                 var nextMidnight = now.Date.AddDays(1);
                 var timeUntilMidnight = nextMidnight - now;
 
-                // Wait until 12 AM
+                //// Wait until 12 AM
                 await Task.Delay(timeUntilMidnight, stoppingToken);
+
+                // Tesing: Wait for 2 minutes before running again
+                //await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken);
 
                 // Run the update logic at midnight
                 await UpdateBusinessReports();
@@ -32,6 +35,7 @@ namespace TenantConsolidatedReports
 
         private async Task UpdateBusinessReports()
         {
+            Console.WriteLine("Updating Business Reports from Background Service");
             using (var scope = _serviceProvider.CreateScope())
             {
                 var _reportDbContext = scope.ServiceProvider.GetRequiredService<ReportDbContext>();
