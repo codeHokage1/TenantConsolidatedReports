@@ -11,5 +11,6 @@ namespace TenantConsolidatedReports.Data
         }
 
         public DbSet<AbpOrganizationUnit> AbpOrganizationUnits { get; set; }
+        public DbSet<AbpUser> AbpUsers { get; set; }
     }
 }

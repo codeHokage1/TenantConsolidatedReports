@@ -26,6 +26,12 @@ builder.Services.AddDbContext<IdentityDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Organization"));
 });
 
+// Add DbCoext for Saas
+builder.Services.AddDbContext<SaasDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SaasService"));
+});
+
 
 
 var app = builder.Build();

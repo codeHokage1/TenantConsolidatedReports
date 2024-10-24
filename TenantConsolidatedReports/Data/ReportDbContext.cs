@@ -9,7 +9,7 @@ namespace TenantConsolidatedReports.Data
         {            
         }
 
-        public DbSet<BusinessUnitReport> Reports { get; set; }
+        public DbSet<BusinessUnitReport> BusinessReports { get; set; }
         public DbSet<ReportsUpdateExecution> ReportsUpdateExecutions { get; set; }
     }
 }

@@ -14,11 +14,13 @@ namespace TenantConsolidatedReports.Controllers
     {
         private readonly ReportDbContext _reportDbContext;
         private readonly IdentityDBContext _identityDbContext;
+        private readonly SaasDbContext _saasDbContext;
 
-        public ReportsController(ReportDbContext reportDbContext, IdentityDBContext identityDbContext)
+        public ReportsController(ReportDbContext reportDbContext, IdentityDBContext identityDbContext, SaasDbContext saasDbContext)
         {
             _reportDbContext = reportDbContext;
             _identityDbContext = identityDbContext;
+            _saasDbContext = saasDbContext;
         }
 
         // Endpoint to get business-report
@@ -26,7 +28,7 @@ namespace TenantConsolidatedReports.Controllers
         [Route("business-report")]
         async public Task<IActionResult> GetBusinessReports()
         {
-            var reports = await _reportDbContext.Reports.ToListAsync();
+            var reports = await _reportDbContext.BusinessReports.ToListAsync();
             return Ok(reports);
         }
 
@@ -51,7 +53,7 @@ namespace TenantConsolidatedReports.Controllers
             };
 
             // Create businessReport from the businessReportInput
-            var createdBusinessReport = await _reportDbContext.Reports.AddAsync(businessReport);
+            var createdBusinessReport = await _reportDbContext.BusinessReports.AddAsync(businessReport);
             await _reportDbContext.SaveChangesAsync();
 
             // Map the created businessReport to the BusinessUnitReportDTO
@@ -91,39 +93,86 @@ namespace TenantConsolidatedReports.Controllers
             // Loop through each business unit detail check if the business unit is already in the reportDb
             foreach(var unit in  businessUnitsDetails)
             {
+                var parentName = "tempParentName";
+                var unitHeadName = "tempUnitHeadName";
+                var tenantName = "tempTenantName";
+
                 // check if the business unit is already in the reportDb
-                var foundBusinessUnit = await _reportDbContext.Reports.FirstOrDefaultAsync(x => x.BusinessUnitId == unit.Id);
+                var foundBusinessUnit = await _reportDbContext.BusinessReports.FirstOrDefaultAsync(x => x.BusinessUnitId == unit.Id);
                 // if no, add the business unit details to the reportDb
                 if(foundBusinessUnit == null)
                 {
+                    // Get the ParentName: the DisplayName of a BusinessUnit with the same Id as the ParentId of the current BusinessUnit
+                    var parentDetails = await _identityDbContext.AbpOrganizationUnits.FirstOrDefaultAsync(x => x.Id == unit.ParentId);
+                    if (parentDetails != null)
+                    {
+                        parentName = parentDetails.DisplayName;
+                    }
+
+                    // Get UnitHeadFullName from AbpUser table, where the Id is the UnitHeadId of the current BusinessUnit
+                    var unitHeadDetails = await _identityDbContext.AbpUsers.FirstOrDefaultAsync(x => x.Id == unit.UnitHeadId);
+                    if(unitHeadDetails != null)
+                    {
+                        unitHeadName = unitHeadDetails.Name + " " + unitHeadDetails.Surname;
+                    }
+
+                    // Get the TenantName from the SaasTenant table, where the Id is the TenantId of the current BusinessUnit
+                    var tenantDetails = await _saasDbContext.SaasTenants.FirstOrDefaultAsync(x => x.Id == unit.TenantId);
+                    if(tenantDetails != null)
+                    {
+                        tenantName = tenantDetails.Name;
+                    }
+
                     Console.WriteLine(unit.DisplayName + " does not exist in the reportDb");
                     var newBusinessUnitReport = new BusinessUnitReport
                     {
                         BusinessUnitId = unit.Id,
                         TenantId =  unit.TenantId ?? Guid.Empty,
-                        TenantName = "tempTenantName",
+                        TenantName = tenantName,
                         DisplayName = unit.DisplayName,
                         ParentId = unit.ParentId ?? Guid.Empty,
-                        ParentName = "tempParentName",
+                        ParentName = parentName,
                         UnitHeadId = unit.UnitHeadId ?? Guid.Empty,
-                        UnitHeadFullName = "tempUnitHeadName",
+                        UnitHeadFullName = unitHeadName,
                         UnitId = unit.UnitID ?? String.Empty
 
                     };
-                    await _reportDbContext.Reports.AddAsync(newBusinessUnitReport);
+                    await _reportDbContext.BusinessReports.AddAsync(newBusinessUnitReport);
                     await _reportDbContext.SaveChangesAsync();
                     newlyAddedReport++;                    
                 } else
                 {
                     // if yes, find that businessUnit details in the report and update the info from the identityDb
+
+                    // Get the ParentName: the DisplayName of a BusinessUnit with the same Id as the ParentId of the current BusinessUnit
+                    var parentDetails = await _identityDbContext.AbpOrganizationUnits.FirstOrDefaultAsync(x => x.Id == unit.ParentId);
+                    if (parentDetails != null)
+                    {
+                        parentName = parentDetails.DisplayName;
+                    }
+
+                    // Get UnitHeadFullName from AbpUser table, where the Id is the UnitHeadId of the current BusinessUnit
+                    var unitHeadDetails = await _identityDbContext.AbpUsers.FirstOrDefaultAsync(x => x.Id == unit.UnitHeadId);
+                    if (unitHeadDetails != null)
+                    {
+                        unitHeadName = unitHeadDetails.Name + " " + unitHeadDetails.Surname;
+                    }
+
+                    // Get the TenantName from the SaasTenant table, where the Id is the TenantId of the current BusinessUnit
+                    var tenantDetails = await _saasDbContext.SaasTenants.FirstOrDefaultAsync(x => x.Id == unit.TenantId);
+                    if (tenantDetails != null)
+                    {
+                        tenantName = tenantDetails.Name;
+                    }
+
                     Console.WriteLine(unit.DisplayName + " exists in the reportDb");
                     foundBusinessUnit.TenantId = unit.TenantId ?? Guid.Empty;
-                    foundBusinessUnit.TenantName = "tempTenantName";
+                    foundBusinessUnit.TenantName = tenantName;
                     foundBusinessUnit.DisplayName = unit.DisplayName;
                     foundBusinessUnit.ParentId = unit.ParentId ?? Guid.Empty;
-                    foundBusinessUnit.ParentName = "tempParentName";
+                    foundBusinessUnit.ParentName = parentName;
                     foundBusinessUnit.UnitHeadId = unit.UnitHeadId ?? Guid.Empty;
-                    foundBusinessUnit.UnitHeadFullName = "tempUnitHeadName";
+                    foundBusinessUnit.UnitHeadFullName = unitHeadName;
                     foundBusinessUnit.UnitId = unit.UnitID ?? String.Empty;
                     foundBusinessUnit.LastUpdated = DateTime.Now;
                     await _reportDbContext.SaveChangesAsync();
